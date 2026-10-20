@@ -20,29 +20,24 @@
 本身不包含套餐、免费额度或生成 credits。安装和诊断不会产生生成费用；`hypit build` 才会提交可能
 计费的生成请求。
 
-以下价格于 **2026-10-20** 从网站公开费率区核验。促销和价格可能调整，最终以提交前服务端返回的
-报价为准。
+以下价格于 **2026-10-20** 从网站公开费率区核验。价格不是固定值，会随市场价和算力成本浮动，
+最终以提交前服务端返回的报价为准。
 
-| 服务档位 | 480P | 768P | 1088P |
-| --- | ---: | ---: | ---: |
+分辨率 | 480P | 768P | 1088P |
+--- | ---: | ---: | ---: |
 | Standard | 6 credits/秒 | 8 credits/秒 | 12 credits/秒 |
-| VIP | 5 credits/秒 | 7 credits/秒 | 10 credits/秒 |
 
 计费页说明 `CNY 1 = 100 credits`。按此换算，Standard 480P 促销价约为 `0.06 元/秒`。网站公开费率
-同时显示美元参考值：Standard 为 `$0.06 / $0.08 / $0.12` 每秒，VIP 为
-`$0.05 / $0.07 / $0.10` 每秒，分别对应 480P / 768P / 1088P。
+同时显示美元参考值：Standard 为 `$0.06 / $0.08 / $0.12` 每秒，分别对应
+480P / 768P / 1088P。
 
-低价特点包括：按秒和分辨率明确计费、480P 促销入口价较低、VIP 档进一步降价，以及在一个工作台
-内批量生成候选。网站还提供参考图片/音频槽位和 Prompt 编译。低价不等于无限量，最终费用由时长、
-分辨率、候选数量和实际服务端报价共同决定。
+低价特点包括：按秒和分辨率明确计费、480P 促销入口价较低，以及在一个工作台内批量生成候选。
+网站还提供参考图片/音频槽位和 Prompt 编译。低价不等于无限量，最终费用由时长、分辨率、候选数量
+和实际服务端报价共同决定。
 
 ![Budget Video Studio 生成参数](https://raw.githubusercontent.com/monkeybad/hypit-provider-minimax-h3-public/main/docs/getcheapvideo/usage-workbench.png)
 
 *时长、画面比例和分辨率设置。*
-
-![GetCheapVideo 当前公开价格](https://raw.githubusercontent.com/monkeybad/hypit-provider-minimax-h3-public/main/docs/getcheapvideo/pricing.png)
-
-*当前公开的按秒费率；提交付费请求前请再次确认报价。*
 
 ![充值规则](https://raw.githubusercontent.com/monkeybad/hypit-provider-minimax-h3-public/main/docs/getcheapvideo/billing.png)
 

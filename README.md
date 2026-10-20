@@ -23,32 +23,26 @@ batch video workbench with image/audio references and prompt compilation.
 source Provider does not include a subscription, free quota or generation credits. Installing the
 package and running diagnostics is free; `hypit build` can submit a paid generation request.
 
-Prices below were checked on **2026-10-20** on the public price display. Promotions and rates can
-change, so the quote shown by the service before submission is authoritative.
+Prices below were checked on **2026-10-20** on the public price display. Prices are not fixed and
+may fluctuate with market rates and compute costs. The quote shown by the service before submission
+is authoritative.
 
-| Service tier | 480P | 768P | 1088P |
-| --- | ---: | ---: | ---: |
+Resolution | 480P | 768P | 1088P |
+--- | ---: | ---: | ---: |
 | Standard | 6 credits/s | 8 credits/s | 12 credits/s |
-| VIP | 5 credits/s | 7 credits/s | 10 credits/s |
 
 The billing page states `CNY 1 = 100 credits`. At that conversion, the Standard promotion is about
 `CNY 0.06` per second at 480P. The public rate display also shows the USD equivalents:
-Standard `$0.06 / $0.08 / $0.12` per second and VIP `$0.05 / $0.07 / $0.10` per second for
-480P / 768P / 1088P.
+Standard `$0.06 / $0.08 / $0.12` per second for 480P / 768P / 1088P.
 
 The low-price characteristics are explicit per-second and per-resolution rates, a low 480P
-promotional entry price, lower VIP rates, and batch candidate generation in one workbench. The
-service also provides reference image/audio slots and prompt compilation. Prices are not a promise
-of unlimited output: duration, resolution, candidates and actual server quotes determine the final
-charge.
+promotional entry price, and batch candidate generation in one workbench. The service also provides
+reference image/audio slots and prompt compilation. Prices are not a promise of unlimited output:
+duration, resolution, candidates and actual server quotes determine the final charge.
 
 ![Generation settings in Budget Video Studio](https://raw.githubusercontent.com/monkeybad/hypit-provider-minimax-h3-public/main/docs/getcheapvideo/usage-workbench.png)
 
 *Generation settings for duration, aspect ratio and resolution.*
-
-![Current public GetCheapVideo pricing](https://raw.githubusercontent.com/monkeybad/hypit-provider-minimax-h3-public/main/docs/getcheapvideo/pricing.png)
-
-*Current public per-second pricing. Verify the quote before submitting a paid request.*
 
 ![Credits and billing rules](https://raw.githubusercontent.com/monkeybad/hypit-provider-minimax-h3-public/main/docs/getcheapvideo/billing.png)
 

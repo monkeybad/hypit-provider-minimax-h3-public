@@ -16,21 +16,19 @@ does not include credits, a free quota or a subscription. Installing the package
 `hypit auth status`, `hypit doctor` and `hypit plan` does not submit a charge; `hypit build` can
 submit a paid generation request.
 
-Current public per-second pricing, verified on **2026-10-20**:
+Current public per-second pricing, verified on **2026-10-20**. Prices are not fixed and may
+fluctuate with market rates and compute costs:
 
-| Tier | 480P | 768P | 1088P |
-| --- | ---: | ---: | ---: |
+Resolution | 480P | 768P | 1088P |
+--- | ---: | ---: | ---: |
 | Standard | 6 credits/s | 8 credits/s | 12 credits/s |
-| VIP | 5 credits/s | 7 credits/s | 10 credits/s |
 
 The billing page states `CNY 1 = 100 credits`; the Standard 480P promotion is about
 `CNY 0.06` per second. The site also displays USD equivalents. These are low per-second rates,
-with a cheaper 480P entry tier, further discounted VIP rates and batch candidate generation.
-Prices can change, and the service quote before submission is authoritative.
+with a cheaper 480P entry tier and batch candidate generation. The service quote before
+submission is authoritative.
 
 ![Budget Video Studio generation settings](https://raw.githubusercontent.com/monkeybad/hypit-provider-minimax-h3-public/main/docs/getcheapvideo/usage-workbench.png)
-
-![GetCheapVideo pricing](https://raw.githubusercontent.com/monkeybad/hypit-provider-minimax-h3-public/main/docs/getcheapvideo/pricing.png)
 
 ![GetCheapVideo billing rules](https://raw.githubusercontent.com/monkeybad/hypit-provider-minimax-h3-public/main/docs/getcheapvideo/billing.png)
 
@@ -75,20 +73,16 @@ for the exact model limits, secure credential flow and HTTP contract.
 安装、`hypit auth status`、`hypit doctor` 和 `hypit plan` 不会提交生成任务；`hypit build`
 会提交可能计费的生成请求。
 
-2026-10-20 核验的公开按秒价格：
+2026-10-20 核验的公开按秒价格。价格不是固定值，会随市场价和算力成本浮动：
 
-| 档位 | 480P | 768P | 1088P |
-| --- | ---: | ---: | ---: |
+分辨率 | 480P | 768P | 1088P |
+--- | ---: | ---: | ---: |
 | Standard | 6 credits/秒 | 8 credits/秒 | 12 credits/秒 |
-| VIP | 5 credits/秒 | 7 credits/秒 | 10 credits/秒 |
 
 计费页说明 `1 元 = 100 credits`，Standard 480P 促销价约为 `0.06 元/秒`。网站还显示美元参考值。
-低价特点包括按秒/分辨率明确计费、480P 低门槛、VIP 进一步降价和批量候选生成。价格可能调整，
-以提交前服务端报价为准。
+低价特点包括按秒/分辨率明确计费、480P 低门槛和批量候选生成。最终以提交前服务端报价为准。
 
 ![Budget Video Studio 生成参数](https://raw.githubusercontent.com/monkeybad/hypit-provider-minimax-h3-public/main/docs/getcheapvideo/usage-workbench.png)
-
-![GetCheapVideo 公开价格](https://raw.githubusercontent.com/monkeybad/hypit-provider-minimax-h3-public/main/docs/getcheapvideo/pricing.png)
 
 ![GetCheapVideo 充值规则](https://raw.githubusercontent.com/monkeybad/hypit-provider-minimax-h3-public/main/docs/getcheapvideo/billing.png)
 
