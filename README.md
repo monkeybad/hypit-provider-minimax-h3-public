@@ -1,5 +1,7 @@
 # `@monkeybad/provider-minimax-h3`
 
+[English](README.md) | [简体中文](README.zh-CN.md)
+
 Third-party Hypit Provider for a self-hosted MiniMax H3 Open V2 API. It implements the existing
 Hypit capability:
 
@@ -10,6 +12,99 @@ Hypit capability:
 This is an independent community package. It is not an official Hypit or MiniMax distribution.
 The operator of the configured API deployment remains responsible for service availability,
 model access, pricing, data handling and API compatibility.
+
+## GetCheapVideo / Budget Video Studio
+
+[GetCheapVideo](https://app.getcheapvideo.com/) is the hosted video service used by the default
+endpoint in this package. The site is branded **Budget Video Studio** and describes itself as a
+batch video workbench with image/audio references and prompt compilation.
+
+**The service is paid.** You need a GetCheapVideo account and credits to generate video. The open
+source Provider does not include a subscription, free quota or generation credits. Installing the
+package and running diagnostics is free; `hypit build` can submit a paid generation request.
+
+Prices below were checked on **2026-10-20** on the public price display. Promotions and rates can
+change, so the quote shown by the service before submission is authoritative.
+
+| Service tier | 480P | 768P | 1088P |
+| --- | ---: | ---: | ---: |
+| Standard | 6 credits/s | 8 credits/s | 12 credits/s |
+| VIP | 5 credits/s | 7 credits/s | 10 credits/s |
+
+The billing page states `CNY 1 = 100 credits`. At that conversion, the Standard promotion is about
+`CNY 0.06` per second at 480P. The public rate display also shows the USD equivalents:
+Standard `$0.06 / $0.08 / $0.12` per second and VIP `$0.05 / $0.07 / $0.10` per second for
+480P / 768P / 1088P.
+
+The low-price characteristics are explicit per-second and per-resolution rates, a low 480P
+promotional entry price, lower VIP rates, and batch candidate generation in one workbench. The
+service also provides reference image/audio slots and prompt compilation. Prices are not a promise
+of unlimited output: duration, resolution, candidates and actual server quotes determine the final
+charge.
+
+![Generation settings in Budget Video Studio](https://raw.githubusercontent.com/monkeybad/hypit-provider-minimax-h3-public/main/docs/getcheapvideo/usage-workbench.png)
+
+*Generation settings for duration, aspect ratio and resolution.*
+
+![Current public GetCheapVideo pricing](https://raw.githubusercontent.com/monkeybad/hypit-provider-minimax-h3-public/main/docs/getcheapvideo/pricing.png)
+
+*Current public per-second pricing. Verify the quote before submitting a paid request.*
+
+![Credits and billing rules](https://raw.githubusercontent.com/monkeybad/hypit-provider-minimax-h3-public/main/docs/getcheapvideo/billing.png)
+
+*Credits are purchased before use; the screenshot contains only the public billing rules.*
+
+### Use the website
+
+1. Open [app.getcheapvideo.com](https://app.getcheapvideo.com/) and register or sign in.
+2. Open **Credits & Billing**, top up credits and review the displayed price. The current page
+   supports Alipay top-ups of `CNY 1-50` per order; larger top-ups are handled through its
+   support channel. The server quote is final.
+3. Open **Video generation**. Enter a prompt and choose duration, aspect ratio and resolution.
+   Add reference images or audio when the selected model supports them.
+4. Review the estimated reservation, submit the batch and download the completed video from the
+   task results.
+5. To connect Hypit, open **Developer -> API keys** and create an API key for the same account.
+   Keep the key private.
+
+The website price table and this Provider's declared API subset are related but not identical.
+The website currently lists a 1088P tier; the Provider exposes only the Open V2 values documented
+under [Supported request subset](#supported-request-subset). Do not assume every website control
+is accepted by this adapter.
+
+### Example output
+
+The following 4-second, 768P, 9:16 sample was generated through MiniMax H3 with this line of
+text-to-video direction: *"A calm slow dolly across a white ceramic cup on a walnut table at dawn,
+soft window light, shallow depth of field, no text, no logos."*
+
+![Generated H3 example](https://raw.githubusercontent.com/monkeybad/hypit-provider-minimax-h3-public/main/docs/getcheapvideo/example.gif)
+
+[Open or download the full MP4](https://raw.githubusercontent.com/monkeybad/hypit-provider-minimax-h3-public/main/docs/getcheapvideo/example.mp4).
+
+### Connect the website API to Hypit
+
+From the Hypit project that will use the Provider:
+
+```bash
+npm install @hypit/minimax-h3@^0.2.0
+npm install git+https://github.com/monkeybad/hypit-provider-minimax-h3-public.git
+npx hypit-provider-minimax-h3-setup
+hypit auth status minimax-h3.selfhosted
+hypit doctor --endpoint minimax-h3.selfhosted
+hypit plan productions/example/example.svrun
+```
+
+The setup command writes a credential reference, starts the hidden credential prompt and does not
+accept the API key as a command-line argument. Never put the key in `hypit.runtime.json`, a Run,
+this README, a shell command or a public CI log. If the key is already in a private file, use:
+
+```bash
+hypit auth login minimax-h3.selfhosted --from /private/path/minimax-h3-key.txt
+```
+
+`auth status`, `doctor` and `plan` do not submit paid generation. Only `hypit build` submits a
+potentially billable request.
 
 ## What it does
 
