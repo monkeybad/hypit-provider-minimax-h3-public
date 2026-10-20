@@ -97,6 +97,7 @@ export type MiniMaxH3ProviderOptions = {
   readonly pool: string;
   readonly baseUrl: string;
   readonly apiKey: CredentialRef;
+  readonly resultOrigins?: readonly string[];
   readonly model?: string;
   readonly projectId?: string;
   readonly concurrency?: number;
@@ -160,6 +161,20 @@ function deploymentMediaUrl(
   assert(url.origin === deployment.origin, `${subject} must belong to the configured deployment`);
   assert(url.pathname.startsWith("/media/"), `${subject} must use the deployment's /media/ path`);
   return url.href;
+}
+
+function parsedResultOrigin(value: string, subject: string): string {
+  let url: URL;
+  try {
+    url = new URL(value);
+  } catch {
+    throw new Error(`${subject} is not a valid URL`);
+  }
+  assert(url.protocol === "https:", `${subject} requires HTTPS`);
+  assert(url.username === "" && url.password === "", `${subject} must not contain credentials`);
+  assert(url.pathname === "/" && url.search === "" && url.hash === "",
+    `${subject} must be an origin without a path, query or fragment`);
+  return url.origin;
 }
 
 function modelName(value: string): MiniMaxModel {
@@ -255,6 +270,11 @@ function contentItem(
 export function createMiniMaxH3Provider(options: MiniMaxH3ProviderOptions) {
   const baseUrl = serviceUrl(options.baseUrl, "MiniMax H3 service baseUrl");
   const deployment = parsedServiceUrl(baseUrl, "MiniMax H3 service baseUrl");
+  const resultOrigins = new Set((options.resultOrigins ?? []).map((value, index) =>
+    parsedResultOrigin(
+      text(value, `MiniMax H3 resultOrigins[${index}]`),
+      `MiniMax H3 resultOrigins[${index}]`,
+    )));
   const model = modelName(text(options.model ?? "MiniMax-H3", "MiniMax H3 service model"));
   const limits = MODEL_LIMITS[model];
   const projectId = options.projectId === undefined
@@ -271,6 +291,13 @@ export function createMiniMaxH3Provider(options: MiniMaxH3ProviderOptions) {
 
   function secret(credentials: Readonly<Record<string, { readonly secret: string }>>): string {
     return text(credentials.apiKey?.secret, "MiniMax H3 apiKey credential");
+  }
+
+  function resultMediaUrl(value: unknown, subject: string): string {
+    if (resultOrigins.size === 0) return deploymentMediaUrl(value, subject, deployment);
+    const url = parsedServiceUrl(text(value, subject), subject);
+    assert(resultOrigins.has(url.origin), `${subject} must belong to configured resultOrigins`);
+    return url.href;
   }
 
   async function apiJson(
@@ -623,7 +650,7 @@ export function createMiniMaxH3Provider(options: MiniMaxH3ProviderOptions) {
         status: "ready",
         handle: {
           id,
-          url: deploymentMediaUrl(content.url, "MiniMax H3 result URL", deployment),
+          url: resultMediaUrl(content.url, "MiniMax H3 result URL"),
         },
         receipt: { id },
       };
@@ -680,7 +707,7 @@ export function createMiniMaxH3Provider(options: MiniMaxH3ProviderOptions) {
 
     async collect(context) {
       const raw = object(context.handle, "MiniMax H3 handle");
-      const url = deploymentMediaUrl(raw.url, "MiniMax H3 result URL", deployment);
+      const url = resultMediaUrl(raw.url, "MiniMax H3 result URL");
       await context.reportProgress?.({ phase: "Downloading MiniMax H3 video" });
       let response: Response;
       try {

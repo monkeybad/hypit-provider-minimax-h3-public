@@ -8,6 +8,18 @@ import {
 } from "@hypit/runtime-local/extension";
 import { createMiniMaxH3Provider, providerModule } from "./provider.js";
 
+function runtimeConfigStringList(
+  value: unknown,
+  subject: string,
+): readonly string[] | undefined {
+  if (value === undefined) return undefined;
+  if (!Array.isArray(value)
+    || value.some((item) => typeof item !== "string" || item.trim().length === 0)) {
+    throw new Error(`${subject} must be an array of non-empty strings`);
+  }
+  return value as readonly string[];
+}
+
 export const hypitPackage = {
   format: "hypit.package@1" as const,
   facets: [createRuntimeEndpointAdapterFacet({
@@ -18,6 +30,7 @@ export const hypitPackage = {
         "protocol",
         "baseUrl",
         "apiKey",
+        "resultOrigins",
         "model",
         "projectId",
         "concurrency",
@@ -37,12 +50,17 @@ export const hypitPackage = {
 
       const pricingUrl = runtimeConfigString(config.pricingUrl, "MiniMax H3 service pricingUrl");
       const projectId = runtimeConfigString(config.projectId, "MiniMax H3 service projectId");
+      const resultOrigins = runtimeConfigStringList(
+        config.resultOrigins,
+        "MiniMax H3 service resultOrigins",
+      );
       return {
         endpoint: createMiniMaxH3Provider({
           instance: context.instance,
           pool: context.pool,
           baseUrl,
           apiKey,
+          ...(resultOrigins === undefined ? {} : { resultOrigins }),
           model: runtimeConfigString(config.model, "MiniMax H3 service model") ?? "MiniMax-H3",
           ...(projectId === undefined ? {} : { projectId }),
           concurrency: runtimeConfigPositiveInteger(config.concurrency, "concurrency") ?? 1,

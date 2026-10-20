@@ -30,6 +30,7 @@ const API_KEY = "test-secret-key";
 const IMAGE_URL = "https://h3.example.test/media/reference-image.png";
 const AUDIO_URL = "https://h3.example.test/media/reference-audio.mp3";
 const VIDEO_URL = "https://h3.example.test/media/result.mp4?signature=signed-value";
+const RESULT_CDN_URL = "https://res.example.test/artifacts/result.mp4?signature=signed-value";
 
 function image(resource: string, size = 4, mediaType = "image/png"): BlobRef {
   return {
@@ -746,6 +747,108 @@ test("rejects a result URL outside the deployment instead of downloading it", as
     async () => await endpoint.poll({ ...context(value, new Map()), handle }),
     /must belong to the configured deployment/u,
   );
+});
+
+test("downloads a result from an explicitly allowlisted HTTPS origin", async () => {
+  const calls: FetchCall[] = [];
+  const fakeFetch: typeof globalThis.fetch = async (input, init) => {
+    const url = String(input);
+    calls.push({ url, ...(init === undefined ? {} : { init }) });
+    if (url.endsWith("/v2/video_generation")) {
+      return json({ task_id: "task-cdn-result" });
+    }
+    if (url.endsWith("/v2/query/video_generation/task-cdn-result")) {
+      return json({
+        task: {
+          id: "task-cdn-result",
+          status: "succeeded",
+          content: { url: RESULT_CDN_URL },
+        },
+      });
+    }
+    if (url === RESULT_CDN_URL) {
+      return new Response(new Uint8Array([1, 2, 3, 4]), {
+        headers: { "content-type": "video/mp4" },
+      });
+    }
+    throw new Error(`unexpected URL ${url}`);
+  };
+  const { install: open } = install(fakeFetch, {
+    resultOrigins: ["https://res.example.test"],
+  });
+  const { endpoint } = await open();
+  const value = request({
+    prompt: ["allowlisted result"],
+    duration: [4],
+    resolution: ["768P"],
+  });
+  const start = await endpoint.start(context(value, new Map()));
+  const startHandle = start.status === "pending" ? start.handle : undefined;
+  assert(startHandle !== undefined);
+  const ready = await endpoint.poll({ ...context(value, new Map()), handle: startHandle });
+  const handle = ready.status === "ready" ? ready.handle : undefined;
+  assert(handle !== undefined);
+  assert(handle !== null && typeof handle === "object" && !Array.isArray(handle));
+  const resultHandle = handle as Readonly<Record<string, unknown>>;
+  assert.equal(resultHandle.url, RESULT_CDN_URL);
+
+  const completed = await endpoint.collect!({
+    ...context(value, new Map()),
+    handle,
+  });
+  assert.equal(completed.status, "completed");
+  const download = calls.at(-1);
+  assert.equal(download?.url, RESULT_CDN_URL);
+  assert.equal(new Headers(download?.init?.headers).has("authorization"), false);
+});
+
+test("rejects result URLs outside a configured resultOrigins allowlist", async () => {
+  const fakeFetch: typeof globalThis.fetch = async (input) => {
+    if (String(input).endsWith("/v2/video_generation")) {
+      return json({ task_id: "task-result-not-allowlisted" });
+    }
+    return json({
+      task: {
+        id: "task-result-not-allowlisted",
+        status: "succeeded",
+        content: { url: "https://other-cdn.example/video.mp4" },
+      },
+    });
+  };
+  const { install: open } = install(fakeFetch, {
+    resultOrigins: ["https://res.example.test"],
+  });
+  const { endpoint } = await open();
+  const value = request({
+    prompt: ["result not allowlisted"],
+    duration: [4],
+    resolution: ["768P"],
+  });
+  const start = await endpoint.start(context(value, new Map()));
+  const handle = start.status === "pending" ? start.handle : undefined;
+  assert(handle !== undefined);
+  await assert.rejects(
+    async () => await endpoint.poll({ ...context(value, new Map()), handle }),
+    /must belong to configured resultOrigins/u,
+  );
+});
+
+test("rejects unsafe resultOrigins configuration", async () => {
+  for (const resultOrigin of [
+    "http://res.example.test",
+    "https://user:password@res.example.test",
+    "https://res.example.test/artifacts",
+    "https://res.example.test?redirect=other",
+    "https://res.example.test#fragment",
+  ]) {
+    assert.throws(
+      () => install(async () => {
+        throw new Error("configuration tests must not call the service");
+      }, { resultOrigins: [resultOrigin] }),
+      /requires HTTPS|must not contain credentials|must be an origin without/u,
+      resultOrigin,
+    );
+  }
 });
 
 test("submits DELETE cancellation with credentials and maps late cancellation", async () => {

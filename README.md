@@ -20,8 +20,9 @@ model access, pricing, data handling and API compatibility.
 - Preserves a task receipt for continuation and uses a stable idempotency key for submission.
 - Retries transient status-query transport failures without treating the remote task as failed.
 - Supports cancellation and reports late-cancellation states without inventing success.
-- Validates the endpoint, asset URLs and result URLs. Credentials and signed URLs are redacted from
-  public failure messages.
+- Validates the endpoint, asset URLs and result URLs. Result downloads require either the
+  deployment's `/media/` path or an explicit `resultOrigins` allowlist. Credentials and signed URLs
+  are redacted from public failure messages.
 - Declares the API key as a writable Hypit credential, so `hypit auth login` can prompt for it
   securely.
 
@@ -35,7 +36,7 @@ use it:
 
 ```bash
 npm install @hypit/minimax-h3@^0.2.0
-npm install git+https://github.com/monkeybad/hypit-provider-minimax-h3.git
+npm install git+https://github.com/monkeybad/hypit-provider-minimax-h3-public.git
 ```
 
 The Model package supplies the `@hypit/minimax-h3@1#minimax-h3` author/compute contract used by
@@ -43,7 +44,35 @@ Studio and project projection. The Provider package maps that capability to the 
 is built during installation through its `prepare` script. An npm registry release is not required
 for this Git-based Provider installation.
 
-## Configure an Endpoint
+## Run setup
+
+From the Hypit project, run the installed setup command:
+
+```bash
+npx hypit-provider-minimax-h3-setup
+```
+
+The setup command:
+
+- creates a starter `hypit.runtime.json` when the project has none;
+- merges the H3 Endpoint and capability binding while retaining unrelated Endpoints, credential
+  stores and bindings;
+- records only a credential reference, never an API key;
+- starts `hypit auth login minimax-h3.selfhosted`, where Hypit securely prompts for the key and
+  stores it in the selected local Credential Store.
+
+Use `--no-login` to configure without prompting. Use `--help` for custom endpoint names, API base
+URLs, result origins and model selection. The setup command does not accept a key argument,
+environment variable or key file.
+
+Check the connection without generating a video:
+
+```bash
+hypit auth status minimax-h3.selfhosted
+hypit doctor --endpoint minimax-h3.selfhosted
+```
+
+## Configure manually
 
 Merge the Provider's `use` value into an existing `hypit.runtime.json`. Do not replace unrelated
 Endpoints or bindings.
@@ -64,6 +93,9 @@ Endpoints or bindings.
           "store": "local",
           "key": "minimax-h3.selfhosted"
         },
+        "resultOrigins": [
+          "https://res.getcheapvideo.com"
+        ],
         "concurrency": 1,
         "pollIntervalMs": 5000,
         "maxMediaBytes": 104857600
@@ -81,6 +113,12 @@ package name in `use` must exactly match `package.json`.
 
 `apiKey` is a credential reference, not the secret itself. Do not put the actual key in the
 Profile, Source, Run, README or Git.
+
+`resultOrigins` is optional and uses exact HTTPS origins only. Configure it when the deployment
+serves completed videos from a media CDN rather than the API gateway's `/media/` path. Entries
+cannot include credentials, a path, query or fragment. If the list is omitted, result URLs remain
+restricted to the deployment origin and its `/media/` path. Do not add wildcard or arbitrary
+redirecting origins.
 
 ## Enter the API key securely
 

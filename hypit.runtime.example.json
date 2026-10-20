@@ -17,6 +17,9 @@
           "store": "local",
           "key": "minimax-h3.selfhosted"
         },
+        "resultOrigins": [
+          "https://res.getcheapvideo.com"
+        ],
         "concurrency": 1,
         "pollIntervalMs": 5000,
         "maxMediaBytes": 104857600
